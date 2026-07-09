@@ -1,8 +1,9 @@
 const path = require("path");
 
+/**
+ * @param {{ env: { (key: string, defaultValue?: any): any, int: (key: string, defaultValue?: any) => number, bool: (key: string, defaultValue?: any) => boolean } }} param0
+ */
 module.exports = ({ env }) => {
-  const client = env("DATABASE_CLIENT", "postgres");
-
   const connections = {
     mysql: {
       connection: {
@@ -20,7 +21,7 @@ module.exports = ({ env }) => {
           cipher: env("DATABASE_SSL_CIPHER", undefined),
           rejectUnauthorized: env.bool(
             "DATABASE_SSL_REJECT_UNAUTHORIZED",
-            true
+            true,
           ),
         },
       },
@@ -44,7 +45,7 @@ module.exports = ({ env }) => {
           cipher: env("DATABASE_SSL_CIPHER", undefined),
           rejectUnauthorized: env.bool(
             "DATABASE_SSL_REJECT_UNAUTHORIZED",
-            true
+            true,
           ),
         },
       },
@@ -69,7 +70,7 @@ module.exports = ({ env }) => {
           cipher: env("DATABASE_SSL_CIPHER", undefined),
           rejectUnauthorized: env.bool(
             "DATABASE_SSL_REJECT_UNAUTHORIZED",
-            true
+            true,
           ),
         },
         schema: env("DATABASE_SCHEMA", "public"),
@@ -84,18 +85,25 @@ module.exports = ({ env }) => {
         filename: path.join(
           __dirname,
           "..",
-          env("DATABASE_FILENAME", ".tmp/data.db")
+          env("DATABASE_FILENAME", ".tmp/data.db"),
         ),
       },
       useNullAsDefault: true,
     },
   };
 
+  const client = /** @type {keyof typeof connections} */ (
+    env("DATABASE_CLIENT", "postgres")
+  );
+
   return {
-    connection: {
-      client,
-      ...connections[client],
-      acquireConnectionTimeout: env.int("DATABASE_CONNECTION_TIMEOUT", 60000),
-    },
+    // avoid TypeScript error when indexing connections with a dynamic key
+    connection: Object.assign(
+      { client },
+      /** @type {any} */ (connections[client] || {}),
+      {
+        acquireConnectionTimeout: env.int("DATABASE_CONNECTION_TIMEOUT", 60000),
+      },
+    ),
   };
 };
