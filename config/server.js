@@ -1,4 +1,6 @@
-module.exports = ({ env }) => ({
+/**
+ * @param {{ env: any }} args
+ */module.exports = ({ env }) => ({
   host: env('HOST', '0.0.0.0'),
   port: env.int('PORT', 1337),
   app: {

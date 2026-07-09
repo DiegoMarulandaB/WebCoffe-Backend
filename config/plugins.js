@@ -1,5 +1,8 @@
 // module.exports = () => ({});
 
+/**
+ * @param {{ env: (key: string) => string }} args
+ */
 module.exports = ({ env }) => ({
   upload: {
     config: {
